@@ -219,3 +219,13 @@ CRONJOBS = [
 # Cron job settings
 CRONTAB_LOCK_JOBS = True  # Prevent multiple instances from running
 CRONTAB_COMMAND_PREFIX = 'cd ' + str(BASE_DIR) + ' && '  # Set working directory
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# Where collectstatic will put all files
+STATIC_ROOT = "/var/www/.code/store_backend/StoreBackend/staticfiles"
+
+# For media uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = "/var/www/.code/store_backend/StoreBackend/media"
