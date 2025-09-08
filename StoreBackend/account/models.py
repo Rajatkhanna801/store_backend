@@ -18,6 +18,8 @@ class User(AbstractUser):
     phone_number = models.CharField(
         max_length=15,
         blank=True,
+        unique=True,
+        null=True,
         validators=[RegexValidator(r"^\+?\d{7,15}$", "Enter a valid phone number.")],
         help_text="E.g. +919999999999",
     )
