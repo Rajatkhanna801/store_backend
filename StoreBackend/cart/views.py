@@ -24,11 +24,11 @@ class CartViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="List cart items",
-        description="Get all items in the user's cart along with all user addresses",
+        description="Get all items in the user's cart along with the default user address (or empty dict if no default address)",
         responses={200: CartSerializer},
         examples=[
             OpenApiExample(
-                "Cart with items and addresses",
+                "Cart with items and default address",
                 value={
                     "id": 1,
                     "items": [
@@ -45,21 +45,45 @@ class CartViewSet(viewsets.ViewSet):
                             "updated_at": "2025-01-13T10:00:00Z"
                         }
                     ],
-                    "user_addresses": [
-                        {
-                            "id": 1,
-                            "street_address": "123 Main St",
-                            "city": "New York",
-                            "state": "NY",
-                            "postal_code": "10001",
-                            "country": "USA",
-                            "is_default": True
-                        }
-                    ],
+                    "user_address": {
+                        "id": 1,
+                        "street_address": "123 Main St",
+                        "city": "New York",
+                        "state": "NY",
+                        "postal_code": "10001",
+                        "country": "USA",
+                        "is_default": True,
+                        "created_at": "2025-01-13T10:00:00Z",
+                        "updated_at": "2025-01-13T10:00:00Z"
+                    },
                     "created_at": "2025-01-13T10:00:00Z",
                     "updated_at": "2025-01-13T10:00:00Z"
                 },
-                description="Example response showing cart items and user addresses"
+                description="Example response showing cart items and default address"
+            ),
+            OpenApiExample(
+                "Cart with items and no default address",
+                value={
+                    "id": 1,
+                    "items": [
+                        {
+                            "id": 1,
+                            "product": {
+                                "id": 1,
+                                "name": "Sample Product",
+                                "price": "99.99"
+                            },
+                            "quantity": 2,
+                            "status": "active",
+                            "created_at": "2025-01-13T10:00:00Z",
+                            "updated_at": "2025-01-13T10:00:00Z"
+                        }
+                    ],
+                    "user_addresses": {},
+                    "created_at": "2025-01-13T10:00:00Z",
+                    "updated_at": "2025-01-13T10:00:00Z"
+                },
+                description="Example response when user has no default address"
             )
         ]
     )

@@ -39,13 +39,16 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemReadSerializer(many=True, read_only=True)
-    user_addresses = serializers.SerializerMethodField()
+    user_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ["id", "items", "user_addresses", "created_at", "updated_at"]
+        fields = ["id", "items", "user_address", "created_at", "updated_at"]
 
-    def get_user_addresses(self, obj):
-        """Get all addresses for the cart's user"""
-        addresses = obj.user.addresses.all()
-        return AddressSerializer(addresses, many=True).data
+    def get_user_address(self, obj):
+        """Get the default address for the cart's user, or empty dict if none"""
+        try:
+            default_address = obj.user.addresses.get(is_default=True)
+            return AddressSerializer(default_address).data
+        except obj.user.addresses.model.DoesNotExist:
+            return {}
