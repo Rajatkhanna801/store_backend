@@ -24,8 +24,44 @@ class CartViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="List cart items",
-        description="Get all items in the user's cart",
-        responses={200: CartSerializer}
+        description="Get all items in the user's cart along with all user addresses",
+        responses={200: CartSerializer},
+        examples=[
+            OpenApiExample(
+                "Cart with items and addresses",
+                value={
+                    "id": 1,
+                    "items": [
+                        {
+                            "id": 1,
+                            "product": {
+                                "id": 1,
+                                "name": "Sample Product",
+                                "price": "99.99"
+                            },
+                            "quantity": 2,
+                            "status": "active",
+                            "created_at": "2025-01-13T10:00:00Z",
+                            "updated_at": "2025-01-13T10:00:00Z"
+                        }
+                    ],
+                    "user_addresses": [
+                        {
+                            "id": 1,
+                            "street_address": "123 Main St",
+                            "city": "New York",
+                            "state": "NY",
+                            "postal_code": "10001",
+                            "country": "USA",
+                            "is_default": True
+                        }
+                    ],
+                    "created_at": "2025-01-13T10:00:00Z",
+                    "updated_at": "2025-01-13T10:00:00Z"
+                },
+                description="Example response showing cart items and user addresses"
+            )
+        ]
     )
     def list(self, request):
         cart = self.get_cart(request.user)
