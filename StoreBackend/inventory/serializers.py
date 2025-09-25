@@ -23,12 +23,15 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "description", "price", "discounted_price", "effective_price", "quantity", "category", "images", "is_added_to_cart"]
 
     def get_is_added_to_cart(self, obj):
-        user = self.context.get('request').user
-        if user.is_authenticated:
-            # Get the user's cart
-            cart = Cart.objects.filter(user=user).first()
-            if cart:
-                # Check if the product is already in the user's cart and is active
-                cart_item = CartItem.objects.filter(cart=cart, product=obj, status=CartItem.Status.ACTIVE).first()
-                return True if cart_item else False
-        return False
+        try:
+            user = self.context.get('request').user
+            if user.is_authenticated:
+                # Get the user's cart
+                cart = Cart.objects.filter(user=user).first()
+                if cart:
+                    # Check if the product is already in the user's cart and is active
+                    cart_item = CartItem.objects.filter(cart=cart, product=obj, status=CartItem.Status.ACTIVE).first()
+                    return True if cart_item else False
+            return False
+        except:
+            return False
