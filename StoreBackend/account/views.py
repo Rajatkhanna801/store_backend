@@ -84,8 +84,10 @@ class AddressViewSet(viewsets.ModelViewSet):
 class EmailTokenObtainPairView(TokenObtainPairView):
     """
     POST /api/accounts/login/
-    Accepts: { "email": "...", "password": "..." }
+    Accepts: { "email_or_phone": "...", "password": "..." }
     Returns: refresh + access + user details
+    
+    Can login with either email or phone number.
     """
     serializer_class = CustomTokenObtainPairSerializer
 

@@ -26,6 +26,15 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["name", "description"]  # ?search=galaxy
     permission_classes = [permissions.AllowAny]  # Public access for products
 
+    def get_serializer_context(self):
+        """
+        Add the user to the serializer context so it can be accessed in the serializer.
+        """
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Add the request to the context
+        return context
+
+
 # Example of a protected view that requires authentication
 class UserFavoriteViewSet(viewsets.ModelViewSet):
     """
