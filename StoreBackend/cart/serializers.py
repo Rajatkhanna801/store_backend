@@ -48,7 +48,7 @@ class CartSerializer(serializers.ModelSerializer):
     def get_user_address(self, obj):
         """Get the default address for the cart's user, or empty dict if none"""
         try:
-            default_address = obj.user.addresses.get(is_default=True)
-            return AddressSerializer(default_address).data
+            default_address = obj.user.addresses.filter(is_default=True).last()
+            return AddressSerializer(default_address).data if default_address else None
         except obj.user.addresses.model.DoesNotExist:
             return {}
