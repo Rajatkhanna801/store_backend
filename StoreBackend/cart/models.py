@@ -44,6 +44,33 @@ class Cart(TimeStampedModel):
             # Return 0 if there's any calculation error
             return Decimal('0.00')
 
+    def subtotal_details(self):
+        """Calculate totals: actual, total (effective), discount"""
+        items = self.items.filter(status=CartItem.Status.ACTIVE).select_related("product")
+        actual_price = Decimal("0.00")
+        total_amount = Decimal("0.00")
+
+        for item in items:
+            if not item.product:
+                continue
+
+            # original (non-discounted) price
+            if item.product.price is not None:
+                actual_price += Decimal(str(item.product.price)) * item.quantity
+
+            # effective price (discounted if available)
+            effective = item.product.effective_price
+            if effective is not None:
+                total_amount += Decimal(str(effective)) * item.quantity
+
+        discount_price = actual_price - total_amount
+        return {
+            "actual_price": actual_price,
+            "total_amount": total_amount,
+            "discount_price": discount_price
+        }
+
+
 class CartItem(TimeStampedModel):
     class Status(models.TextChoices):
         ACTIVE = "active", "Active"

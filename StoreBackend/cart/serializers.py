@@ -40,15 +40,19 @@ class CartItemSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemReadSerializer(many=True, read_only=True)
     user_address = serializers.SerializerMethodField()
+    totals = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ["id", "items", "user_address", "created_at", "updated_at"]
+        fields = ["id", "items", "user_address", "totals", "created_at", "updated_at"]
 
     def get_user_address(self, obj):
-        """Get the default address for the cart's user, or empty dict if none"""
         try:
             default_address = obj.user.addresses.filter(is_default=True).last()
             return AddressSerializer(default_address).data if default_address else None
         except obj.user.addresses.model.DoesNotExist:
             return {}
+
+    def get_totals(self, obj):
+        return obj.subtotal_details()
+
