@@ -49,10 +49,8 @@ class RegisterView(generics.CreateAPIView):
                 "email": user.email,
                 "phone_number": user.phone_number,
             },
-            "tokens": {
-                "access": access_token,
-                "refresh": refresh_token,
-            },
+            "access": access_token,
+            "refresh": refresh_token
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
         
