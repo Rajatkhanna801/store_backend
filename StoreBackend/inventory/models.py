@@ -11,6 +11,12 @@ class TimeStampedModel(models.Model):
 class Category(TimeStampedModel):
     name = models.CharField(max_length=120, unique=True)
     description = models.TextField(blank=True)
+    icon = models.ImageField(
+        upload_to="category_icons/",
+        blank=True,
+        null=True,
+        help_text="Upload a small icon for this category"
+    )
 
     class Meta:
         ordering = ["name"]
