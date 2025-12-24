@@ -81,7 +81,7 @@ class OrderAdmin(admin.ModelAdmin):
         'mark_payment_paid', 'mark_payment_failed', 'mark_payment_refunded',
         'regenerate_payment_data', 'mark_as_confirmed', 'mark_as_shipped',
         'mark_as_delivered', 'mark_as_cancelled', 'bulk_status_update',
-        'export_orders_excel', 'export_orders_pdf'
+        'export_orders_excel'
     ]
 
 
@@ -98,31 +98,54 @@ class OrderAdmin(admin.ModelAdmin):
             "Product", "Qty", "Price", "Total",
             "Order Status", "Payment Status", "Created At"
         ]
-
         ws.append(headers)
+        
+        # Adding extra space between headers and content
+        row = 2  # Start the content from row 2
         for col in range(1, len(headers) + 1):
             ws.cell(row=1, column=col).font = Font(bold=True)
-
+        
+        user_order_map = {}
+        
         for order in queryset:
             address = order.shipping_address
-
+            customer_key = (order.user.get_full_name(), order.user.email, address.address_line1, address.city, address.state, address.pincode)
+            
+            if customer_key not in user_order_map:
+                user_order_map[customer_key] = {'order_id': order.id, 'user_name': order.user.get_full_name(), 'email': order.user.email,
+                                                'address': address.address_line1, 'city': address.city, 'state': address.state, 'pincode': address.pincode,
+                                                'status': order.get_status_display(), 'payment_status': order.get_payment_status_display(), 
+                                                'created_at': order.created_at.strftime("%Y-%m-%d %H:%M"), 'items': []}
+            
             for item in order.items.all():
+                total_price = item.price_at_purchase * item.quantity
+                user_order_map[customer_key]['items'].append({
+                    'product': item.product.name,
+                    'quantity': item.quantity,
+                    'price_at_purchase': item.price_at_purchase,
+                    'total_price': total_price
+                })
+        
+        # Now add data to sheet
+        for user_data in user_order_map.values():
+            for item in user_data['items']:
                 ws.append([
-                    order.id,
-                    order.user.get_full_name(),
-                    order.user.email,
-                    address.address_line1,
-                    address.city,
-                    address.state,
-                    address.pincode,  # FIXED: uses your actual model
-                    item.product.name,
-                    item.quantity,
-                    float(item.price_at_purchase),
-                    float(item.total_price),
-                    order.get_status_display(),
-                    order.get_payment_status_display(),
-                    order.created_at.strftime("%Y-%m-%d %H:%M"),
+                    user_data['order_id'],
+                    user_data['user_name'],
+                    user_data['email'],
+                    user_data['address'],
+                    user_data['city'],
+                    user_data['state'],
+                    user_data['pincode'],
+                    item['product'],
+                    item['quantity'],
+                    float(item['price_at_purchase']),
+                    float(item['total_price']),
+                    user_data['status'],
+                    user_data['payment_status'],
+                    user_data['created_at']
                 ])
+                row += 1
 
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
