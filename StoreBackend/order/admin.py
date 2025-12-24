@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.http import HttpResponse
 from django.utils.formats import number_format
 
-from .models import Order, OrderItem, Checkout, CheckoutItem
+from .models import Order, OrderItem, Checkout, CheckoutItem, StoreSettings
 from django.conf import settings
 
 # EXPORT LIBRARIES
@@ -398,3 +398,6 @@ class CheckoutAdmin(admin.ModelAdmin):
         expired.delete()
         self.message_user(request, f"Deleted {count} expired checkouts")
     delete_expired_checkouts.short_description = "Delete expired checkouts"
+
+
+admin.site.register(StoreSettings)

@@ -13,6 +13,21 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
+class StoreSettings(models.Model):
+    """Store settings for minimum order and other configurations"""
+    minimum_order_amount = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        default=1000.00,  # Example default minimum amount
+        validators=[MinValueValidator(0)],
+        help_text="Minimum order amount to proceed with checkout"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Store Settings (Minimum Order: {self.minimum_order_amount})"
+
 class Checkout(TimeStampedModel):
     """Temporary checkout model to hold items for configurable time"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="checkouts")
