@@ -6,7 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from .models import Order, OrderItem, Checkout, CheckoutItem
+from .models import Order, OrderItem, Checkout, CheckoutItem, StoreSettings
 from cart.models import Cart, CartItem
 from .serializers import (
     OrderSerializer, OrderCreateSerializer, OrderItemWriteSerializer,
@@ -83,6 +83,16 @@ class CheckoutViewSet(viewsets.ViewSet):
                         {"detail": "No valid cart items found"}, 
                         status=status.HTTP_400_BAD_REQUEST
                     )
+                
+                # Check the minimum order amount
+                store_settings = StoreSettings.objects.first()
+                total_amount = sum(item.product.effective_price * item.quantity for item in cart_items)
+                if store_settings and store_settings.minimum_order_amount:
+                    if total_amount < store_settings.minimum_order_amount:
+                        return Response(
+                            {"detail": f"Minimum order amount is {store_settings.minimum_order_amount}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
                 
                 # Validate inventory using utility function
                 is_valid, inventory_errors = validate_inventory_for_order(cart_items)

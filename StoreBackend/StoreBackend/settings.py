@@ -224,8 +224,8 @@ CRONTAB_COMMAND_PREFIX = 'cd ' + str(BASE_DIR) + ' && '  # Set working directory
 STATIC_URL = '/static/'
 
 # Where collectstatic will put all files
-STATIC_ROOT = "/var/www/.code/store_backend/StoreBackend/staticfiles"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # For media uploads
 MEDIA_URL = '/media/'
-MEDIA_ROOT = "/var/www/.code/store_backend/StoreBackend/media"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Banner
 from cart.models import Cart, CartItem
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -35,3 +35,19 @@ class ProductSerializer(serializers.ModelSerializer):
             return False
         except:
             return False
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = [
+            "id",
+            "title",
+            "description",
+            "image",
+            "link_type",
+            "link_value",
+            "priority",
+            "start_date",
+            "end_date",
+        ]

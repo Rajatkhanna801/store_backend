@@ -64,3 +64,38 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"
+
+
+class Banner(TimeStampedModel):
+    class LinkType(models.TextChoices):
+        PRODUCT = 'product', 'Product'
+        CATEGORY = 'category', 'Category'
+        EXTERNAL = 'external', 'External URL'
+        SCREEN = 'screen', 'App Screen'
+
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to="banners/")
+    link_type = models.CharField(
+        max_length=20,
+        choices=LinkType.choices,
+        default=LinkType.PRODUCT
+    )
+    link_value = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Product ID, Category ID, external URL, or screen name"
+    )
+    is_active = models.BooleanField(default=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    priority = models.PositiveIntegerField(
+        default=0,
+        help_text="Higher priority banners appear first"
+    )
+
+    class Meta:
+        ordering = ["-priority", "-created_at"]
+
+    def __str__(self):
+        return self.title
