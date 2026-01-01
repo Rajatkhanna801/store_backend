@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.formats import number_format
 
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Banner
 
 
 # ---------------------------------------------------------
@@ -287,3 +287,55 @@ class CategoryAdmin(admin.ModelAdmin):
         )
 
     merge_categories.short_description = "Merge selected categories"
+
+
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "banner_preview",
+        "title",
+        "link_type",
+        "link_value",
+        "is_active",
+        "priority",
+        "start_date",
+        "end_date",
+        "created_at",
+    ]
+
+    list_filter = ["is_active", "link_type", "created_at", "start_date", "end_date"]
+    search_fields = ["title", "description", "link_value"]
+    list_editable = ["is_active", "priority"]
+
+    readonly_fields = ["created_at", "updated_at", "banner_preview"]
+
+    fieldsets = (
+        ("Banner Information", {
+            "fields": ("title", "description", "image", "banner_preview")
+        }),
+        ("Link Configuration", {
+            "fields": ("link_type", "link_value"),
+            "description": "Configure where clicking the banner navigates to"
+        }),
+        ("Display Settings", {
+            "fields": ("is_active", "priority", "start_date", "end_date"),
+            "description": "Control when and how the banner is displayed"
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",)
+        }),
+    )
+
+    list_per_page = 20
+
+    def banner_preview(self, obj):
+        if obj.image:
+            return mark_safe(
+                f'<img src="{obj.image.url}" width="120" height="60" '
+                f'style="object-fit:cover; border-radius:4px;" />'
+            )
+        return "No image"
+
+    banner_preview.short_description = "Preview"
