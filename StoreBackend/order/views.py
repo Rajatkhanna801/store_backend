@@ -333,6 +333,16 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         try:
             with transaction.atomic():
+                # Check minimum order amount
+                store_settings = StoreSettings.objects.first()
+                subtotal = sum(item.product.effective_price * item.quantity for item in items)
+                if store_settings and store_settings.minimum_order_amount:
+                    if subtotal < store_settings.minimum_order_amount:
+                        return Response(
+                            {"detail": f"Minimum order amount is {store_settings.minimum_order_amount}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
                 # Validate inventory using utility function
                 is_valid, inventory_errors = validate_inventory_for_order(items)
                 if not is_valid:
