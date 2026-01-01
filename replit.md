@@ -66,6 +66,11 @@ cd StoreBackend && python manage.py runserver 0.0.0.0:5000
 
 ## Recent Changes
 
+- 2026-01-01: Added payment QR code to order response
+  - Order responses now include `payment_qr_code` field from StoreSettings
+  - Mobile app can display QR code after order placement for manual payment
+  - Admin updates `payment_status` from "pending" to "paid" in admin panel
+
 - 2026-01-01: Added delivery charge and minimum order validation
   - Updated checkout flow to validate minimum_order_amount from StoreSettings
   - Added delivery_charge to order total calculations

@@ -96,7 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
     delivery_charge = serializers.SerializerMethodField()
     total_amount = serializers.SerializerMethodField()
-    payment_qr_data = serializers.CharField(read_only=True)
+    payment_qr_code = serializers.SerializerMethodField()
     payment_status = serializers.CharField(read_only=True)
 
     def get_subtotal(self, obj):
@@ -108,16 +108,25 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_total_amount(self, obj):
         return obj.total_amount()
 
+    def get_payment_qr_code(self, obj):
+        store_settings = StoreSettings.objects.first()
+        if store_settings and store_settings.qr_code:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(store_settings.qr_code.url)
+            return store_settings.qr_code.url
+        return None
+
     class Meta:
         model = Order
         fields = [
             "id", "user", "shipping_address", "status", "payment_status", 
-            "payment_qr_data", "notes", "items", 
+            "payment_qr_code", "notes", "items", 
             "subtotal", "delivery_charge", "total_amount", "created_at", "updated_at"
         ]
         read_only_fields = [
             "user", "shipping_address", "created_at", "updated_at", 
-            "subtotal", "delivery_charge", "total_amount", "payment_qr_data", "payment_status"
+            "subtotal", "delivery_charge", "total_amount", "payment_qr_code", "payment_status"
         ]
 
 class OrderSummarySerializer(serializers.ModelSerializer):
@@ -125,7 +134,7 @@ class OrderSummarySerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
     delivery_charge = serializers.SerializerMethodField()
     total_amount = serializers.SerializerMethodField()
-    payment_qr_data = serializers.CharField(read_only=True)
+    payment_qr_code = serializers.SerializerMethodField()
     payment_status = serializers.CharField(read_only=True)
 
     def get_subtotal(self, obj):
@@ -137,7 +146,16 @@ class OrderSummarySerializer(serializers.ModelSerializer):
     def get_total_amount(self, obj):
         return obj.total_amount()
 
+    def get_payment_qr_code(self, obj):
+        store_settings = StoreSettings.objects.first()
+        if store_settings and store_settings.qr_code:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(store_settings.qr_code.url)
+            return store_settings.qr_code.url
+        return None
+
     class Meta:
         model = Order
-        fields = ["id", "subtotal", "delivery_charge", "total_amount", "payment_qr_data", "payment_status", "status", "created_at"]
-        read_only_fields = ["subtotal", "delivery_charge", "total_amount", "payment_qr_data", "payment_status"]
+        fields = ["id", "subtotal", "delivery_charge", "total_amount", "payment_qr_code", "payment_status", "status", "created_at"]
+        read_only_fields = ["subtotal", "delivery_charge", "total_amount", "payment_qr_code", "payment_status"]
