@@ -66,6 +66,12 @@ cd StoreBackend && python manage.py runserver 0.0.0.0:5000
 
 ## Recent Changes
 
+- 2026-01-01: Added delivery charge and minimum order validation
+  - Updated checkout flow to validate minimum_order_amount from StoreSettings
+  - Added delivery_charge to order total calculations
+  - Checkout and Order responses now include: subtotal, delivery_charge, total_amount
+  - Added null-safety for when StoreSettings is not configured
+
 - 2026-01-01: Added Banner API for mobile app
   - Created Banner model with mobile-friendly deep linking (link_type + link_value)
   - Added `/api/inventory/banners/` endpoint for displaying promotional offers
