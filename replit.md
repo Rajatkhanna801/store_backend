@@ -48,9 +48,10 @@ cd StoreBackend && python manage.py runserver 0.0.0.0:5000
 - `GET/POST /api/accounts/addresses/` - Manage addresses
 
 ### Inventory
-- `GET /api/products/` - List products (supports filtering, sorting, pagination)
-- `GET /api/products/{id}/` - Product details
-- `GET /api/categories/` - List categories
+- `GET /api/inventory/products/` - List products (supports filtering, sorting, pagination)
+- `GET /api/inventory/products/{id}/` - Product details
+- `GET /api/inventory/categories/` - List categories
+- `GET /api/inventory/banners/` - List active banners for mobile app display
 
 ### Cart
 - `GET /api/cart/` - View cart
@@ -64,6 +65,12 @@ cd StoreBackend && python manage.py runserver 0.0.0.0:5000
 - `GET /api/orders/{id}/` - Order details
 
 ## Recent Changes
+
+- 2026-01-01: Added Banner API for mobile app
+  - Created Banner model with mobile-friendly deep linking (link_type + link_value)
+  - Added `/api/inventory/banners/` endpoint for displaying promotional offers
+  - Banners support scheduling with start_date/end_date and priority ordering
+  - Django Admin interface for managing banners
 
 - 2026-01-01: Initial Replit setup
   - Installed Python 3.11 and dependencies
