@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Cart, CartItem
+from order.models import StoreSettings
 from inventory.serializers import ProductSerializer
 from account.serializers import AddressSerializer
 
@@ -37,14 +38,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ["id", "product", "product_id", "quantity", "status"]
 
+
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemReadSerializer(many=True, read_only=True)
     user_address = serializers.SerializerMethodField()
     totals = serializers.SerializerMethodField()
+    delivery_charge = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ["id", "items", "user_address", "totals", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "items",
+            "user_address",
+            "delivery_charge",
+            "totals",
+            "created_at",
+            "updated_at",
+        ]
 
     def get_user_address(self, obj):
         try:
@@ -53,6 +64,27 @@ class CartSerializer(serializers.ModelSerializer):
         except obj.user.addresses.model.DoesNotExist:
             return {}
 
+    def get_delivery_charge(self, obj):
+        settings = StoreSettings.objects.order_by("-id").first()
+        return settings.delivery_charge if settings else 0
+
     def get_totals(self, obj):
-        return obj.subtotal_details()
+        """
+        Expected obj.subtotal_details() example:
+        {
+            "subtotal": 1200.00,
+            "tax": 0.00,
+            "total": 1200.00
+        }
+        """
+        totals = obj.subtotal_details()
+
+        settings = StoreSettings.objects.order_by("-id").first()
+        delivery_charge = settings.delivery_charge if settings else 0
+
+        totals["delivery_charge"] = delivery_charge
+        totals["grand_total"] = totals.get("total", 0) + delivery_charge
+
+        return totals
+
 

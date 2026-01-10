@@ -22,6 +22,19 @@ class StoreSettings(models.Model):
         validators=[MinValueValidator(0)],
         help_text="Minimum order amount to proceed with checkout"
     )
+    delivery_charge = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(0)],
+        help_text="Fixed delivery / cash on delivery charge"
+    )
+    qr_code = models.FileField(
+        upload_to="store_settings/qr_codes/",
+        blank=True,
+        null=True,
+        help_text="QR code file for store payments"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

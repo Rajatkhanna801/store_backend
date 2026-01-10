@@ -85,7 +85,7 @@ class CheckoutViewSet(viewsets.ViewSet):
                     )
                 
                 # Check the minimum order amount
-                store_settings = StoreSettings.objects.first()
+                store_settings = StoreSettings.objects.last()
                 total_amount = sum(item.product.effective_price * item.quantity for item in cart_items)
                 if total_amount < store_settings.minimum_order_amount:
                     return Response(
