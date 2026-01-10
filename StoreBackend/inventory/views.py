@@ -1,7 +1,9 @@
 from rest_framework import viewsets, filters, permissions, pagination
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from django.utils import timezone
+from django.db.models import Q
+from .models import Category, Product, Banner
+from .serializers import CategorySerializer, ProductSerializer, BannerSerializer
 
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     """Standard pagination for consistent API responses"""
@@ -50,3 +52,19 @@ class UserFavoriteViewSet(viewsets.ModelViewSet):
         user = self.request.user
         # Example: return user-specific data
         return Category.objects.all()  # Placeholder - replace with actual user-specific logic
+
+
+class BannerViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = BannerSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        now = timezone.now()
+        return Banner.objects.filter(
+            is_active=True
+        ).filter(
+            Q(start_date__isnull=True) | Q(start_date__lte=now)
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=now)
+        ).order_by("-priority", "-created_at")

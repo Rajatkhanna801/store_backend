@@ -101,7 +101,7 @@ class OrderAdmin(admin.ModelAdmin):
         ws.append(headers)
         
         # Adding extra space between headers and content
-        row = 2  # Start the content from row 2
+        row = 3  # Start the content from row 2
         for col in range(1, len(headers) + 1):
             ws.cell(row=1, column=col).font = Font(bold=True)
         
